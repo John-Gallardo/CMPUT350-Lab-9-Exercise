@@ -114,7 +114,7 @@ struct DynamicCamera {
         // std::cout << cameraOffsetWorld << '\n';
 
         // 7. update cameraUnadjustedCenter without lookahead
-        cameraUnadjustedCenter = sf::Vector2f{cameraOffsetWorld, cameraUnadjustedCenter.y};
+        cameraUnadjustedCenter += sf::Vector2f{cameraOffsetWorld, 0.0f};
     }
 
     float alpha;  // alpha to use for damping of camera position, *as well as* for smoothing of
