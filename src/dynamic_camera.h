@@ -59,6 +59,10 @@ struct DynamicCamera {
         // convert to negative if going left
         if (trackedVelocityWorld.x < 0) {
             lookAheadWorld.x *= -1;
+        } 
+        // if player velocity is 0, we don't want any look ahead!
+        if (trackedVelocityWorld.x == 0) {
+            lookAheadWorld.x = 0;
         }
 
         // 3. update lookAhead state using EMA
