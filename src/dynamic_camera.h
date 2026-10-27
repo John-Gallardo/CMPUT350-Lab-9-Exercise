@@ -62,10 +62,10 @@ struct DynamicCamera {
         }
 
         // 3. update lookAhead state using EMA
-        // formula: positionNew = positionCurrent + alpha * (target - positionCurrent), target = cameraUnadjustedCenter + lookAheadWorld
-        // -> lookaheadState = lookaheadState + alpha * (cameraUnadjustedCenter + lookAheadWorld - lookaheadState)
+        // formula: positionNew = positionCurrent + alpha * (target - positionCurrent)
+        // -> lookaheadState = lookaheadState + alpha * (lookAheadWorld - lookaheadState)
         // only use x since we lookahead for y is 0 anyway
-        lookaheadState = lookaheadState + alpha * (cameraUnadjustedCenter.x + lookAheadWorld.x - lookaheadState);
+        lookaheadState = lookaheadState + alpha * (lookAheadWorld.x - lookaheadState);
 
         // 4. determine if player is in dead zone, soft rejection, or hard rejection zone
         bool inDeadZone{deadZoneX.contains(trackedPosWindowPercent.x)};
@@ -91,6 +91,7 @@ struct DynamicCamera {
             }
             */
         } else {
+            /*
             // camera offset in the hard rejection zone is just the difference between in X between the player position and the corresponding red line
             if (trackedPosWindowPercent.x < softZoneX.min) {
                 // Case 1: in left hard zone
@@ -99,11 +100,13 @@ struct DynamicCamera {
                 // Case 2: in right hard zone
                 cameraOffsetWorld = trackedPosWorld.x - camera.windowPercentToWorldDist({softZoneX.max, 0.0f}).x;
             }
+            */
         }
 
         // 6. set camera center
         // NOTE: y offset is 0!!!
         camera.setCameraCenter(cameraUnadjustedCenter + sf::Vector2f{cameraOffsetWorld, 0.0f} + sf::Vector2f{lookaheadState, 0.0f});
+        std::cout << lookaheadState << '\n';
         // std::cout << cameraOffsetWorld << '\n';
 
         // 7. update cameraUnadjustedCenter without lookahead
