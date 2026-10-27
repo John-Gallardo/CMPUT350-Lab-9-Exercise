@@ -80,12 +80,37 @@ public:
     sf::Vector2f getCameraCenter() const { return mViewCenterWorld; }
 
     // TODO NEW STUFF: Equivalent to above, but for vectors (distances for 1D) instead of points
-    sf::Vector2f windowToWorldDist(const sf::Vector2f& vWindow) { return {}; };
-    sf::Vector2f worldToWindowDist(const sf::Vector2f& vWorld) { return {}; };
-    sf::Vector2f windowPercentToWorldDist(const sf::Vector2f& vWindowPercent) { return {}; };
-    sf::Vector2f worldToWindowPercentDist(const sf::Vector2f& vWorld) { return {}; };
-    float windowToWorldDist(float vWindow) { return 0.f; };
-    float worldToWindowDist(float vWorld) { return 0.f; };
+    sf::Vector2f windowToWorldDist(const sf::Vector2f& vWindow) {
+        // same formula as windowToWorld except no offsets
+        return vWindow * mWorldUnitsPerPixel;
+    }
+
+    sf::Vector2f worldToWindowDist(const sf::Vector2f& vWorld) {
+        // same formula as worldToWindow except no offsets
+        return vWorld / mWorldUnitsPerPixel;  // divide so units are pixels
+    }
+
+    sf::Vector2f windowPercentToWorldDist(const sf::Vector2f& vWindowPercent) {
+        // convert vWindowPercent -> vWindow then just call function
+        sf::Vector2f vWindow{vWindowPercent * mWindowSize};
+        return windowToWorldDist(vWindow);
+    }
+
+    sf::Vector2f worldToWindowPercentDist(const sf::Vector2f& vWorld) {
+        // grab result then just divide by mWindowSize to get window percent
+        sf::Vector2f vWindow{worldToWindowDist(vWorld)};
+        return vWindow / mWindowSize; 
+    }
+
+    float windowToWorldDist(float vWindow) {
+        // same as other windowToWorldDist except for floats
+        return vWindow * mWorldUnitsPerPixel;
+    }
+
+    float worldToWindowDist(float vWorld) {
+        // same as other worldToWindowDist except for floats
+        return vWorld / mWorldUnitsPerPixel;
+    }
 
 private:
     sf::Vector2f mWindowSize;       // size of the window in screen pixels (i.e. window coords)
