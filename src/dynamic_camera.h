@@ -77,23 +77,27 @@ struct DynamicCamera {
         // inHardRejectionZone is just the else block
 
         // 5. deal with the 3 cases
-        static float cameraOffsetWorld{0.0f};  // static to keep track of state for EMA
+        static float cameraOffsetWorld{};  // static to keep track of state for EMA
         if (inDeadZone) {
             // camera doesn't move in deadzone
             cameraOffsetWorld = 0.0f;
         } else if (inSoftRejectionZone) {
-            // perform EMA
-            /*
+            // grab max camera offset (vector from left or right green line to current position)
+            sf::Vector2f maxCameraOffsetWorld{};
             if (trackedPosWindowPercent.x < deadZoneX.min) {
                 // Case 1: on left soft rejection zone
-                // formula: cameraOffsetWorld = cameraOffsetWorld + alpha * (left green line - cameraOffsetWorld)
-                cameraOffsetWorld = cameraOffsetWorld + alpha * (camera.windowPercentToWorldDist({softZoneX.min, 0.0f}).x - cameraOffsetWorld);
+                // -> we want vector from left green line to current position (points left)
+                maxCameraOffsetWorld = camera.windowPercentToWorldDist(sf::Vector2f{trackedPosWindowPercent.x - deadZoneX.min, 0.0f});
             } else {
                 // Case 2: on right soft rejection zone
-                // formula: cameraOffsetWorld = cameraOffsetWorld + alpha * (right green line - cameraOffsetWorld)
-                cameraOffsetWorld = cameraOffsetWorld + alpha * (camera.windowPercentToWorldDist({softZoneX.max, 0.0f}).x - cameraOffsetWorld);
+                // -> we want vector from right green line to current position (points right)
+                maxCameraOffsetWorld = camera.windowPercentToWorldDist(sf::Vector2f{trackedPosWindowPercent.x - deadZoneX.max, 0.0f});
             }
-            */
+
+            // perform EMA since we only want to move a fraction of the max
+            // formula: positionNew = positionCurrent + alpha * (target - positionCurrent)
+            // -> cameraOffsetWorld = 0.0f + alpha * (maxCameraOffsetWorld)
+            cameraOffsetWorld = 0.0f + alpha * (maxCameraOffsetWorld.x);
         } else {
             // camera offset in the hard rejection zone is just the difference between in X between the player position and the corresponding red line
             if (trackedPosWindowPercent.x < softZoneX.min) {
@@ -111,7 +115,6 @@ struct DynamicCamera {
         // 6. set camera center
         // NOTE: y offset is 0!!!
         camera.setCameraCenter(cameraUnadjustedCenter + sf::Vector2f{cameraOffsetWorld, 0.0f} + sf::Vector2f{lookaheadState, 0.0f});
-        std::cout << camera.worldToWindowPercentDist({cameraOffsetWorld, 0.0f}).x << '\n';
 
         // 7. update cameraUnadjustedCenter without lookahead
         cameraUnadjustedCenter += sf::Vector2f{cameraOffsetWorld, 0.0f};
