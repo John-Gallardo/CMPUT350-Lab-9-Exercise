@@ -98,21 +98,20 @@ struct DynamicCamera {
             // camera offset in the hard rejection zone is just the difference between in X between the player position and the corresponding red line
             if (trackedPosWindowPercent.x < softZoneX.min) {
                 // Case 1: in left hard zone
-                // convert to screen percentange for direct comparison with left soft zone then convert back to world coordinates
-                // vector constructors & member accesses are to appeal function parameters & grab x only
                 // idea is: grab distance from left red wall to player's x position
-                cameraOffsetWorld = camera.windowPercentToWorld(sf::Vector2f{trackedPosWindowPercent.x - softZoneX.min, 0.0f}).x;
+                // vector constructors & member accesses are to appeal function parameters & grab x only
+                cameraOffsetWorld = camera.windowPercentToWorldDist(sf::Vector2f{trackedPosWindowPercent.x - softZoneX.min, 0.0f}).x;
             } else {
                 // Case 2: in right hard zone
                 // idea: grab distance from right red wall to player's x position
-                cameraOffsetWorld = camera.windowPercentToWorld(sf::Vector2f{trackedPosWindowPercent.x - softZoneX.max, 0.0f}).x;
+                cameraOffsetWorld = camera.windowPercentToWorldDist(sf::Vector2f{trackedPosWindowPercent.x - softZoneX.max, 0.0f}).x;
             }
         }
 
         // 6. set camera center
         // NOTE: y offset is 0!!!
         camera.setCameraCenter(cameraUnadjustedCenter + sf::Vector2f{cameraOffsetWorld, 0.0f} + sf::Vector2f{lookaheadState, 0.0f});
-        std::cout << cameraOffsetWorld << '\n';
+        std::cout << camera.worldToWindowPercentDist({cameraOffsetWorld, 0.0f}).x << '\n';
 
         // 7. update cameraUnadjustedCenter without lookahead
         cameraUnadjustedCenter += sf::Vector2f{cameraOffsetWorld, 0.0f};

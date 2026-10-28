@@ -141,6 +141,11 @@ int main() {
         rightHardLine.setPosition({windowSize.x * dynamicCam.softZoneX.max, 0.f});
         rightSoftLine.setPosition({windowSize.x * dynamicCam.deadZoneX.max, 0.f});
 
+        // TODO: remove after finished debugging
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::J)) {
+            dynamicCam.cameraUnadjustedCenter.x = player.position.x;
+        }
+
         worldView.setCenter(camera.getCameraCenter());
         window.clear(sf::Color::Black);
         // world rendering
